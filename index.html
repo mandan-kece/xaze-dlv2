@@ -3,364 +3,785 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Xaze Downloader ⚡ | TikTok No Watermark</title>
+    <title>Xaze Tools X Downloader | All in One</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
 
         body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0B0F1C 0%, #0A0E1A 100%);
             min-height: 100vh;
-            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03050b);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: rgba(10, 15, 30, 0.98);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(0, 255, 255, 0.2);
+            z-index: 1000;
+            transition: left 0.3s ease;
+            padding: 25px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar-header .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00FFFF, #FF2D95);
+            border-radius: 20px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 1.5rem;
-            position: relative;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 12px;
         }
 
-        /* Efek glitch / neon garis belakang */
-        body::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(0deg, rgba(0,255,255,0.03) 0px, rgba(0,255,255,0.03) 2px, transparent 2px, transparent 8px);
-            pointer-events: none;
+        .sidebar-header h3 {
+            font-size: 1.2rem;
         }
 
-        /* CARD UTAMA - NEON BORDER MEWAH */
-        .downloader-card {
-            max-width: 650px;
-            width: 100%;
-            background: rgba(12, 20, 30, 0.65);
-            backdrop-filter: blur(18px);
-            border-radius: 56px;
-            border: 1px solid rgba(0, 255, 255, 0.5);
-            box-shadow: 0 25px 45px rgba(0,0,0,0.5), 0 0 0 2px rgba(0,255,255,0.1), 0 0 0 5px rgba(0,0,0,0.2);
-            overflow: hidden;
-            transition: 0.3s;
+        .sidebar-header p {
+            font-size: 0.7rem;
+            color: #8A8F99;
         }
 
-        /* Header xaze */
-        .xaze-header {
-            padding: 1.5rem 2rem;
-            background: rgba(0, 0, 0, 0.6);
-            border-bottom: 2px solid cyan;
+        .menu-item {
+            padding: 14px 24px;
             display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            border-left: 3px solid transparent;
         }
-        .title-glow h1 {
-            font-size: 1.9rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #00ffff, #ff66ff);
+
+        .menu-item:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .menu-item.active {
+            border-left-color: #00FFFF;
+            background: rgba(0, 255, 255, 0.08);
+        }
+
+        .menu-icon {
+            font-size: 1.4rem;
+            width: 32px;
+        }
+
+        .menu-text {
+            font-weight: 500;
+        }
+
+        .menu-sub {
+            font-size: 0.7rem;
+            color: #6A6F7E;
+            margin-top: 2px;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.7rem;
+            color: #5A5F6E;
+        }
+
+        /* OVERLAY */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 15, 30, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: white;
+            padding: 5px;
+        }
+
+        .logo h1 {
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #00FFFF, #FF2D95);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: -0.5px;
-            text-shadow: 0 0 8px cyan;
-        }
-        .title-glow p {
-            font-size: 0.7rem;
-            color: #ccddff;
-            letter-spacing: 1px;
-        }
-        .badge-pro {
-            background: #000000aa;
-            backdrop-filter: blur(4px);
-            padding: 6px 14px;
-            border-radius: 60px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            border: 1px solid cyan;
-            color: cyan;
         }
 
-        /* body form */
-        .form-section {
-            padding: 2rem 2rem 1.5rem;
+        .logo p {
+            font-size: 0.6rem;
+            color: #8A8F99;
         }
-        .label {
-            font-weight: 600;
-            margin-bottom: 12px;
-            display: block;
-            color: #bbddff;
-            letter-spacing: 0.5px;
+
+        .about-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #00FFFF, #FF2D95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
         }
+
+        /* MAIN CONTENT */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            min-height: calc(100vh - 70px);
+        }
+
+        .greeting {
+            margin-bottom: 30px;
+        }
+
+        .greeting h2 {
+            font-size: 1.6rem;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .platform-card {
+            background: rgba(20, 25, 45, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 18px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .platform-card.active {
+            border-color: #00FFFF;
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0,255,255,0.2);
+        }
+
+        .platform-icon {
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+
+        .platform-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .downloader-box {
+            background: rgba(15, 20, 35, 0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 25px;
+        }
+
+        .platform-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .platform-title span {
+            font-size: 1.8rem;
+        }
+
+        .platform-title h3 {
+            font-size: 1.3rem;
+        }
+
         .input-group {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
         }
+
         .input-group input {
-            flex: 3;
-            background: rgba(0,0,0,0.6);
-            border: 1.5px solid rgba(0, 255, 255, 0.5);
-            padding: 16px 18px;
+            flex: 1;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 60px;
+            padding: 14px 18px;
             color: white;
             font-size: 0.9rem;
             outline: none;
-            transition: 0.2s;
         }
+
         .input-group input:focus {
-            border-color: #ff44ee;
-            box-shadow: 0 0 12px rgba(255, 68, 238, 0.5);
+            border-color: #00FFFF;
         }
+
         .input-group button {
-            flex: 1;
             background: linear-gradient(95deg, #00c9ff, #a855f7);
             border: none;
             border-radius: 60px;
+            padding: 0 25px;
             font-weight: bold;
             color: white;
-            font-size: 1rem;
             cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 2px 12px rgba(0,201,255,0.3);
-        }
-        .input-group button:active {
-            transform: scale(0.96);
         }
 
-        /* loading keren */
-        .loading-overlay {
-            display: none; 
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(12px);
-            padding: 18px;
-            border-radius: 80px;
-            margin: 20px 0;
-            border: 1px solid cyan;
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 25px;
         }
-        .neon-loader {
-            width: 28px;
-            height: 28px;
+
+        .spinner {
+            width: 40px;
+            height: 40px;
             border: 3px solid rgba(0,255,255,0.2);
             border-top: 3px solid cyan;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
         }
+
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text {
-            color: cyan;
-            font-weight: bold;
-            letter-spacing: 2px;
+
+        .result-area {
+            margin-top: 25px;
+            display: none;
         }
 
-        /* result area */
-        .result-box {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 32px;
-            margin: 10px 0 20px;
-            padding: 12px;
-            border-left: 4px solid cyan;
-            transition: 0.2s;
+        video, audio {
+            max-width: 100%;
+            border-radius: 20px;
+            margin-top: 10px;
         }
-        .preview-video {
-            width: 100%;
-            border-radius: 28px;
-            max-height: 380px;
-            object-fit: cover;
-            background: #000;
-        }
-        .btn-download {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: linear-gradient(90deg, #00ffaa, #0099ff);
-            color: black;
-            font-weight: bold;
-            padding: 12px 28px;
-            border-radius: 40px;
+
+        .download-link {
+            display: inline-block;
+            background: #00FFAA;
+            color: #000;
+            padding: 10px 22px;
+            border-radius: 60px;
             text-decoration: none;
-            margin-top: 14px;
-            transition: 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-        .error-msg {
-            color: #ff9797;
-            background: #ff000022;
-            padding: 12px;
-            border-radius: 28px;
-            text-align: center;
+            font-weight: bold;
+            margin-top: 12px;
         }
 
-        /* Footer Dev */
-        .footer-dev {
+        .error-msg {
+            background: rgba(255,0,0,0.15);
+            border: 1px solid #ff4444;
+            border-radius: 28px;
+            padding: 15px;
             text-align: center;
-            padding: 1.2rem;
-            border-top: 1px solid rgba(0,255,255,0.3);
-            font-size: 0.75rem;
-            color: #aaccff;
+            color: #ff8888;
+            font-size: 0.85rem;
         }
-        .dev-name {
-            color: #ff66ff;
-            font-weight: bold;
-            text-shadow: 0 0 4px magenta;
+
+        /* STALKER MODE */
+        .stalker-mode {
+            display: none;
+            text-align: center;
+            padding: 20px;
         }
+
+        .stalker-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* TOOLS MODE */
+        .tools-mode {
+            display: none;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tool-card {
+            background: rgba(20,25,45,0.7);
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tool-card:hover {
+            border-color: cyan;
+            background: rgba(0,255,255,0.1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.65rem;
+            color: #5A5F6E;
+        }
+
         @media (max-width: 550px) {
-            .form-section { padding: 1.5rem; }
-            .title-glow h1 { font-size: 1.4rem; }
+            .platform-grid { grid-template-columns: repeat(3, 1fr); }
+            .downloader-box { padding: 20px; }
+            .input-group button { padding: 0 18px; }
         }
     </style>
 </head>
 <body>
 
-<div class="downloader-card">
-    <div class="xaze-header">
-        <div class="title-glow">
-            <h1>⚡ XAZE DOWNLOADER</h1>
-            <p>TikTok • No Watermark • Super Cepat</p>
+<!-- SIDEBAR MENU -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-icon">🧠</div>
+        <h3>Xaze Tools</h3>
+        <p>v3.0 • Premium</p>
+    </div>
+    <div class="menu-item active" data-page="beranda">
+        <div class="menu-icon">🏠</div>
+        <div>
+            <div class="menu-text">Beranda</div>
+            <div class="menu-sub">Downloader & Tools</div>
         </div>
-        <div class="badge-pro">🎬 PREMIUM API</div>
+    </div>
+    <div class="menu-item" data-page="downloader">
+        <div class="menu-icon">⬇️</div>
+        <div>
+            <div class="menu-text">Downloader</div>
+            <div class="menu-sub">TikTok, IG, YT, FB, Pinterest</div>
+        </div>
+    </div>
+    <div class="menu-item" data-page="stalker">
+        <div class="menu-icon">👀</div>
+        <div>
+            <div class="menu-text">Stalker</div>
+            <div class="menu-sub">Coming Soon</div>
+        </div>
+    </div>
+    <div class="menu-item" data-page="tools">
+        <div class="menu-icon">🛠️</div>
+        <div>
+            <div class="menu-text">Tools</div>
+            <div class="menu-sub">Utilities & Converter</div>
+        </div>
+    </div>
+    <div class="menu-item" data-page="about">
+        <div class="menu-icon">ℹ️</div>
+        <div>
+            <div class="menu-text">About</div>
+            <div class="menu-sub">Developer & Info</div>
+        </div>
+    </div>
+    <div class="sidebar-footer">
+        ⚡ Developed by <strong style="color:cyan;">FIKRI.Z</strong>
+    </div>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <button class="menu-toggle" id="menuToggle">☰</button>
+    <div class="logo">
+        <h1>XAZE TOOLS X</h1>
+        <p>Downloader • Stalker • Tools</p>
+    </div>
+    <div class="about-icon" id="aboutIcon">XZ</div>
+</div>
+
+<!-- MAIN CONTAINER (Default Downloader) -->
+<div class="container" id="mainContainer">
+    <div class="greeting">
+        <h2 id="pageTitle">⬇️ Xaze Downloader</h2>
+        <p id="pageSub">Pilih platform, masukkan link, download gratis!</p>
     </div>
 
-    <div class="form-section">
-        <div class="label">🔗 MASUKIN LINK TIKTOK (video/poto)</div>
+    <!-- Platform Grid (muncul di Beranda & Downloader) -->
+    <div class="platform-grid" id="platformGrid">
+        <div class="platform-card" data-platform="tiktok">
+            <div class="platform-icon">🎵</div>
+            <div class="platform-name">TikTok</div>
+        </div>
+        <div class="platform-card" data-platform="instagram">
+            <div class="platform-icon">📸</div>
+            <div class="platform-name">Instagram</div>
+        </div>
+        <div class="platform-card" data-platform="facebook">
+            <div class="platform-icon">📘</div>
+            <div class="platform-name">Facebook</div>
+        </div>
+        <div class="platform-card" data-platform="ytmp3">
+            <div class="platform-icon">🎵</div>
+            <div class="platform-name">YouTube MP3</div>
+        </div>
+        <div class="platform-card" data-platform="ytmp4">
+            <div class="platform-icon">🎬</div>
+            <div class="platform-name">YouTube MP4</div>
+        </div>
+        <div class="platform-card" data-platform="pinterest">
+            <div class="platform-icon">📌</div>
+            <div class="platform-name">Pinterest</div>
+        </div>
+    </div>
+
+    <!-- Downloader Box -->
+    <div class="downloader-box" id="downloaderBox">
+        <div class="platform-title" id="platformTitle">
+            <span>🎵</span>
+            <h3>TikTok Downloader</h3>
+        </div>
         <div class="input-group">
-            <input type="text" id="tiktokUrl" placeholder="https://www.tiktok.com/@user/video/123456789..." autocomplete="off">
-            <button id="downloadBtn">⬇️ PROSES</button>
+            <input type="text" id="urlInput" placeholder="Masukkan link TikTok...">
+            <button id="downloadBtn">⬇️ Download</button>
         </div>
-
-        <!-- LOADING KEREN -->
-        <div id="loadingArea" class="loading-overlay">
-            <div class="neon-loader"></div>
-            <div class="loading-text">📡 Xaze lagi nembak server ...</div>
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <span>Xaze sedang memproses...</span>
         </div>
-
-        <!-- TEMPAT HASIL -->
-        <div id="resultContainer"></div>
+        <div class="result-area" id="resultArea"></div>
     </div>
 
-    <div class="footer-dev">
-        ✦ DEVELOPED BY <span class="dev-name">FIKRI.Z</span> ✦ <br> 
-        ⚡ xaze downloader | tiktod HD 
+    <!-- Stalker Mode (Hidden) -->
+    <div class="stalker-mode" id="stalkerMode">
+        <div class="downloader-box">
+            <div class="platform-title">
+                <span>👀</span>
+                <h3>Stalker Mode</h3>
+            </div>
+            <p style="text-align:center; margin-bottom:20px; color:#aaa;">Fitur stalker akan segera hadir!<br>IG Story Saver, TikTok Profile, dll.</p>
+            <div class="stalker-input-group">
+                <input type="text" placeholder="Username atau link profil..." id="stalkerInput" disabled>
+                <button disabled style="opacity:0.5;">🚀 Coming Soon</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tools Mode (Hidden) -->
+    <div class="tools-mode" id="toolsMode">
+        <div class="downloader-box">
+            <div class="platform-title">
+                <span>🛠️</span>
+                <h3>Tools Box</h3>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">🔗 Shortlink</div>
+                <div class="tool-card">📷 Image Compress</div>
+                <div class="tool-card">🎵 Audio Cutter</div>
+                <div class="tool-card">📄 Text to Speech</div>
+                <div class="tool-card">💾 QR Generator</div>
+                <div class="tool-card">🌐 IP Checker</div>
+            </div>
+            <p style="text-align:center; margin-top:20px; color:#aaa;">⚡ Tools lainnya segera menyusul</p>
+        </div>
+    </div>
+
+    <!-- About Mode (Hidden) -->
+    <div class="stalker-mode" id="aboutMode">
+        <div class="downloader-box" style="text-align:center;">
+            <div style="width:80px; height:80px; background:linear-gradient(135deg,#00FFFF,#FF2D95); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin:0 auto 20px;">🧠</div>
+            <h3>Xaze Tools X Downloader</h3>
+            <p style="color:#aaa; margin:10px 0;">All-in-One Platform</p>
+            <p style="margin:15px 0; font-size:0.85rem;">✅ Downloader: TikTok, IG, FB, YTMP3, YTMP4, Pinterest<br>✅ Tools: Shortlink, Compress, Audio Cutter, dll<br>✅ Stalker Mode: (Coming Soon)</p>
+            <hr style="margin:15px 0; border-color:#2a2a3a;">
+            <p style="font-size:0.8rem;">Developer: <strong style="color:cyan;">FIKRI.Z</strong><br>API by Faa • Xaze Project</p>
+            <p style="margin-top:12px; font-size:0.7rem;">📱 Telegram: @xaze_zone | WA: +62xxx</p>
+        </div>
     </div>
 </div>
 
+<footer>
+    🧠 <strong style="color:cyan;">Xaze Tools X Downloader</strong> | All features ready to use
+</footer>
+
 <script>
-    // 🧠 API yang dipakai (bisa diganti nanti)
-    // karena API https://api-faa.my.id/faa/tiktok lagi 400, tapi konsepnya FULL SIAP
-    const API_ENDPOINT = "https://api-faa.my.id/faa/tiktok";
-    
-    const inputUrl = document.getElementById('tiktokUrl');
-    const processBtn = document.getElementById('downloadBtn');
-    const loadingDiv = document.getElementById('loadingArea');
-    const resultContainer = document.getElementById('resultContainer');
+    // APIS
+    const APIS = {
+        tiktok: "https://api-faa.my.id/faa/tiktok",
+        instagram: "https://api-faa.my.id/faa/igdl",
+        facebook: "https://api-faa.my.id/faa/fbdownload",
+        ytmp3: "https://api-faa.my.id/faa/ytmp3",
+        ytmp4: "https://api-faa.my.id/faa/ytmp4",
+        pinterest: "https://api-faa.my.id/faa/pin-down"
+    };
 
-    // Fungsi loading
-    function showLoading() {
-        loadingDiv.style.display = "flex";
-        resultContainer.innerHTML = "";
-    }
-    function hideLoading() {
-        loadingDiv.style.display = "none";
+    let currentPlatform = "tiktok";
+
+    // DOM Elements
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const menuToggle = document.getElementById('menuToggle');
+    const menuItems = document.querySelectorAll('.menu-item');
+    const platformCards = document.querySelectorAll('.platform-card');
+    const platformGrid = document.getElementById('platformGrid');
+    const platformTitleSpan = document.querySelector('#platformTitle span');
+    const platformTitleH3 = document.querySelector('#platformTitle h3');
+    const urlInput = document.getElementById('urlInput');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const loader = document.getElementById('loader');
+    const resultArea = document.getElementById('resultArea');
+    const downloaderBox = document.getElementById('downloaderBox');
+    const stalkerMode = document.getElementById('stalkerMode');
+    const toolsMode = document.getElementById('toolsMode');
+    const aboutMode = document.getElementById('aboutMode');
+    const pageTitle = document.getElementById('pageTitle');
+    const pageSub = document.getElementById('pageSub');
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
     }
 
-    // Tampilkan error di result
-    function showError(message) {
-        resultContainer.innerHTML = `<div class="result-box error-msg">⚠️ ${message} <br> <span style="font-size:12px">Coba link lain atau cek network.</span></div>`;
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
     }
 
-    // download logic ⚡ asli siap pakai
-    async function processTikTok() {
-        let urlVideo = inputUrl.value.trim();
-        if (!urlVideo) {
-            showError("Isi link TikTok-nya dulu bree!");
-            return;
-        }
-        
-        showLoading();
-        
+    menuToggle.onclick = () => openSidebar();
+    overlay.onclick = closeSidebar;
+
+    function setActiveMenu(pageId) {
+        menuItems.forEach(item => {
+            if(item.dataset.page === pageId) item.classList.add('active');
+            else item.classList.remove('active');
+        });
+    }
+
+    function setPlatform(platform) {
+        currentPlatform = platform;
+        platformCards.forEach(card => {
+            card.classList.toggle('active', card.dataset.platform === platform);
+        });
+        const titles = {
+            tiktok: { icon: "🎵", name: "TikTok Downloader", placeholder: "Masukkan link TikTok..." },
+            instagram: { icon: "📸", name: "Instagram Downloader", placeholder: "Masukkan link Instagram..." },
+            facebook: { icon: "📘", name: "Facebook Downloader", placeholder: "Masukkan link Facebook..." },
+            ytmp3: { icon: "🎵", name: "YouTube to MP3", placeholder: "Masukkan link YouTube..." },
+            ytmp4: { icon: "🎬", name: "YouTube to MP4", placeholder: "Masukkan link YouTube..." },
+            pinterest: { icon: "📌", name: "Pinterest Downloader", placeholder: "Masukkan link Pinterest..." }
+        };
+        platformTitleSpan.innerText = titles[platform].icon;
+        platformTitleH3.innerText = titles[platform].name;
+        urlInput.placeholder = titles[platform].placeholder;
+        resultArea.style.display = 'none';
+        resultArea.innerHTML = '';
+    }
+
+    function showLoader(show) {
+        loader.style.display = show ? 'block' : 'none';
+    }
+
+    function showError(msg) {
+        resultArea.style.display = 'block';
+        resultArea.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`;
+    }
+
+    async function processDownload() {
+        const url = urlInput.value.trim();
+        if (!url) { showError("Masukkan link dulu bree!"); return; }
+        showLoader(true);
+        resultArea.style.display = 'none';
+        resultArea.innerHTML = '';
+
         try {
-            // 🔥 API call, dengan parameter ?url=
-            const requestUrl = `${API_ENDPOINT}?url=${encodeURIComponent(urlVideo)}`;
-            console.log("Requesting:", requestUrl);
-            
-            const response = await fetch(requestUrl);
+            const apiUrl = APIS[currentPlatform];
+            const response = await fetch(`${apiUrl}?url=${encodeURIComponent(url)}`);
             const data = await response.json();
-            
-            if (!response.ok || (data.status !== true && data.status !== 200 && !data.result)) {
-                throw new Error(`API returned ${response.status} - ${data.message || 'Gagal fetch'}`);
+            console.log(data);
+
+            const isSuccess = data.status === "benar" || data.status === true;
+            if (!isSuccess) throw new Error("Gagal fetch data.");
+
+            const result = data.hasil || data.result;
+
+            switch(currentPlatform) {
+                case 'tiktok':
+                    let videoUrl = result?.alternatives?.nowm_hd || result?.alternatives?.nowm || result?.data || result?.video;
+                    if(videoUrl) {
+                        resultArea.innerHTML = `<video controls src="${videoUrl}" style="width:100%; border-radius:20px;"></video>
+                                                <a href="${videoUrl}" download class="download-link">⬇️ Download Video</a>`;
+                        resultArea.style.display = 'block';
+                    } else throw new Error("Link tidak ditemukan.");
+                    break;
+                case 'instagram':
+                    const media = result?.media || result;
+                    if(Array.isArray(media)) {
+                        let html = '';
+                        media.forEach(item => {
+                            html += `<video controls src="${item}" style="width:100%; border-radius:20px; margin-top:10px;"></video>
+                                    <a href="${item}" download class="download-link">⬇️ Download</a>`;
+                        });
+                        resultArea.innerHTML = html;
+                        resultArea.style.display = 'block';
+                    } else if(typeof media === 'string') {
+                        resultArea.innerHTML = `<img src="${media}" style="max-width:100%; border-radius:20px;"><a href="${media}" download class="download-link">⬇️ Download</a>`;
+                        resultArea.style.display = 'block';
+                    } else throw new Error("Gagal ambil media.");
+                    break;
+                case 'facebook':
+                    const fbUrl = result?.hd || result?.sd || result?.video;
+                    if(fbUrl) {
+                        resultArea.innerHTML = `<video controls src="${fbUrl}" style="width:100%; border-radius:20px;"></video>
+                                                <a href="${fbUrl}" download class="download-link">⬇️ Download Video</a>`;
+                        resultArea.style.display = 'block';
+                    } else throw new Error("Link tidak ditemukan.");
+                    break;
+                case 'ytmp3':
+                    const mp3Url = result?.mp3 || result?.audio;
+                    const title = result?.judul || "Audio";
+                    const thumb = result?.Gambar_mini || "";
+                    if(mp3Url) {
+                        resultArea.innerHTML = `${thumb ? `<img src="${thumb}" style="max-width:200px; border-radius:16px;">` : ''}
+                                                <h4>${title}</h4>
+                                                <audio controls src="${mp3Url}" style="width:100%;"></audio>
+                                                <a href="${mp3Url}" download class="download-link">⬇️ Download MP3</a>`;
+                        resultArea.style.display = 'block';
+                    } else throw new Error("Gagal ambil audio.");
+                    break;
+                case 'ytmp4':
+                    const mp4Url = result?.download_url || result?.url_unduhan || result?.video;
+                    if(mp4Url) {
+                        resultArea.innerHTML = `<video controls src="${mp4Url}" style="width:100%; border-radius:20px;"></video>
+                                                <a href="${mp4Url}" download class="download-link">⬇️ Download MP4</a>`;
+                        resultArea.style.display = 'block';
+                    } else throw new Error("Gagal ambil video.");
+                    break;
+                case 'pinterest':
+                    const pinMedia = result?.medias || result?.media;
+                    if(Array.isArray(pinMedia) && pinMedia.length) {
+                        let html = '';
+                        pinMedia.forEach(item => {
+                            const urlMedia = item.url || item;
+                            if(urlMedia.includes('.mp4')) html += `<video controls src="${urlMedia}" style="width:100%; border-radius:20px; margin-top:10px;"></video><a href="${urlMedia}" download class="download-link">⬇️ Download</a>`;
+                            else html += `<img src="${urlMedia}" style="max-width:100%; border-radius:20px;"><a href="${urlMedia}" download class="download-link">⬇️ Download</a>`;
+                        });
+                        resultArea.innerHTML = html;
+                        resultArea.style.display = 'block';
+                    } else throw new Error("Gagal ambil media.");
+                    break;
+                default: throw new Error("Platform error.");
             }
-            
-            // respons TikTok downloader biasanya mengandung video URL
-            let videoUrl = null;
-            let title = "TikTok Xaze";
-            
-            // cek kemungkinan struktur dari api-faa (nanti disesuaikan)
-            if (data.result) {
-                if (typeof data.result === 'string') videoUrl = data.result;
-                else if (data.result.video) videoUrl = data.result.video;
-                else if (data.result.play) videoUrl = data.result.play;
-                else if (data.result.url) videoUrl = data.result.url;
-                else videoUrl = data.result;
-            } else if (data.video) videoUrl = data.video;
-            else if (data.play) videoUrl = data.play;
-            else if (data.url) videoUrl = data.url;
-            else if (data.link) videoUrl = data.link;
-            
-            // fallback buat testing: jika tidak ada videoUrl karena API 400, kasih dummy demo tapi fungsional keren nanti real API
-            if (!videoUrl && data.status === false) {
-                // Ini hanya untuk preview tampilan keren karena api masih error 400, pas api bener tinggal delete dummy
-                throw new Error("API respon error (mungkin butuh parameter tambahan). Tapi frontend udah siap 100%!");
-            }
-            
-            if (!videoUrl) {
-                throw new Error("Tidak dapat menemukan link download. Format API belum cocok?");
-            }
-            
-            // Sukses - render preview & download button keren
-            resultContainer.innerHTML = `
-                <div class="result-box">
-                    <video controls class="preview-video" src="${videoUrl}"></video>
-                    <div style="display: flex; justify-content: center; margin-top: 12px;">
-                        <a href="${videoUrl}" download target="_blank" class="btn-download">
-                            ⬇️ DOWNLOAD VIDEO (No Watermark)
-                        </a>
-                    </div>
-                    <p style="font-size:12px; margin-top: 12px; text-align:center; opacity:0.8;">✅ Xaze sukses ambil videonya</p>
-                </div>
-            `;
-            
-        } catch (err) {
-            console.error(err);
-            let errorMsg = err.message || "Gagal download, cek kembali link TikTok atau API sedang sibuk.";
-            // Tampilan tetap keceh meski gagal
-            resultContainer.innerHTML = `
-                <div class="result-box error-msg">
-                    🧊 ${errorMsg} <br/><br/>
-                    <span style="font-size: 12px;">💡 tips: pastikan link video TikTok valid (bukan live atau private).</span>
-                </div>
-            `;
+        } catch(err) {
+            showError(err.message);
         } finally {
-            hideLoading();
+            showLoader(false);
         }
     }
-    
-    // event listener
-    processBtn.addEventListener('click', processTikTok);
-    inputUrl.addEventListener('keypress', (e) => {
-        if(e.key === 'Enter') processTikTok();
+
+    // Navigation
+    function showPage(page) {
+        setActiveMenu(page);
+        if(page === 'downloader' || page === 'beranda') {
+            platformGrid.style.display = 'grid';
+            downloaderBox.style.display = 'block';
+            stalkerMode.style.display = 'none';
+            toolsMode.style.display = 'none';
+            aboutMode.style.display = 'none';
+            pageTitle.innerText = page === 'beranda' ? '🏠 Beranda Xaze' : '⬇️ Xaze Downloader';
+            pageSub.innerText = 'Pilih platform, masukkan link, download gratis!';
+        } else if(page === 'stalker') {
+            platformGrid.style.display = 'none';
+            downloaderBox.style.display = 'none';
+            stalkerMode.style.display = 'block';
+            toolsMode.style.display = 'none';
+            aboutMode.style.display = 'none';
+            pageTitle.innerText = '👀 Stalker Mode';
+            pageSub.innerText = 'Fitur stalker akan segera hadir!';
+        } else if(page === 'tools') {
+            platformGrid.style.display = 'none';
+            downloaderBox.style.display = 'none';
+            stalkerMode.style.display = 'none';
+            toolsMode.style.display = 'block';
+            aboutMode.style.display = 'none';
+            pageTitle.innerText = '🛠️ Tools Box';
+            pageSub.innerText = 'Kumpulan tools seru buat lo!';
+        } else if(page === 'about') {
+            platformGrid.style.display = 'none';
+            downloaderBox.style.display = 'none';
+            stalkerMode.style.display = 'none';
+            toolsMode.style.display = 'none';
+            aboutMode.style.display = 'block';
+            pageTitle.innerText = 'ℹ️ About Xaze Tools';
+            pageSub.innerText = 'All-in-One Downloader & Tools';
+        }
+        closeSidebar();
+    }
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', () => showPage(item.dataset.page));
     });
-    
-    // Siap untuk API real nanti (cukup ganti API_ENDPOINT)
-    console.log("Xaze Downloader siap pakai, API endpoint: ", API_ENDPOINT);
+
+    platformCards.forEach(card => {
+        card.addEventListener('click', () => {
+            setPlatform(card.dataset.platform);
+            showPage('downloader');
+        });
+    });
+
+    downloadBtn.addEventListener('click', processDownload);
+    urlInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') processDownload(); });
+
+    const aboutIcon = document.getElementById('aboutIcon');
+    aboutIcon.onclick = () => showPage('about');
+
+    setPlatform('tiktok');
+    showPage('beranda');
 </script>
 </body>
 </html>
