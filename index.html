@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Xaze Tools X Downloader | All in One</title>
+    <title>Xaze Tools | Simple Downloader</title>
     <style>
         * {
             margin: 0;
@@ -12,11 +12,78 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0B0F1C 0%, #0A0E1A 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f0;
+            color: #1a1a1a;
             min-height: 100vh;
+            transition: background 0.2s;
+        }
+
+        /* TEMA GELAP */
+        body.dark {
+            background: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark .card {
+            background: #1e1e1e;
+            border-color: #333;
+        }
+
+        body.dark input {
+            background: #2a2a2a;
             color: #fff;
-            overflow-x: hidden;
+            border-color: #444;
+        }
+
+        /* TEMA KERTAS */
+        body.paper {
+            background: #fef9e6;
+        }
+
+        body.paper .card {
+            background: rgba(255, 248, 235, 0.9);
+            border-color: #d4c9a6;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        body.dark .navbar {
+            background: rgba(30,30,30,0.95);
+            border-bottom-color: #333;
+        }
+
+        body.paper .navbar {
+            background: rgba(255, 248, 235, 0.95);
+        }
+
+        .logo h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .logo span {
+            color: #e07c3c;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            padding: 5px;
         }
 
         /* SIDEBAR */
@@ -26,13 +93,14 @@
             left: -280px;
             width: 280px;
             height: 100%;
-            background: rgba(10, 15, 30, 0.98);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(0, 255, 255, 0.2);
+            background: #fff;
             z-index: 1000;
-            transition: left 0.3s ease;
-            padding: 25px 0;
-            overflow-y: auto;
+            transition: 0.3s;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        body.dark .sidebar {
+            background: #1e1e1e;
         }
 
         .sidebar.open {
@@ -40,87 +108,43 @@
         }
 
         .sidebar-header {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-            text-align: center;
+            padding: 25px 20px;
+            border-bottom: 1px solid #eee;
         }
 
-        .sidebar-header .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #00FFFF, #FF2D95);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            margin: 0 auto 12px;
-        }
-
-        .sidebar-header h3 {
-            font-size: 1.2rem;
-        }
-
-        .sidebar-header p {
-            font-size: 0.7rem;
-            color: #8A8F99;
+        body.dark .sidebar-header {
+            border-bottom-color: #333;
         }
 
         .menu-item {
             padding: 14px 24px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             cursor: pointer;
             transition: 0.2s;
-            border-left: 3px solid transparent;
         }
 
         .menu-item:hover {
-            background: rgba(0, 255, 255, 0.1);
+            background: #f0f0f0;
+        }
+
+        body.dark .menu-item:hover {
+            background: #2a2a2a;
         }
 
         .menu-item.active {
-            border-left-color: #00FFFF;
-            background: rgba(0, 255, 255, 0.08);
+            background: #e07c3c20;
+            border-left: 3px solid #e07c3c;
         }
 
-        .menu-icon {
-            font-size: 1.4rem;
-            width: 32px;
-        }
-
-        .menu-text {
-            font-weight: 500;
-        }
-
-        .menu-sub {
-            font-size: 0.7rem;
-            color: #6A6F7E;
-            margin-top: 2px;
-        }
-
-        .sidebar-footer {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.7rem;
-            color: #5A5F6E;
-        }
-
-        /* OVERLAY */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
             z-index: 999;
             display: none;
         }
@@ -129,309 +153,242 @@
             display: block;
         }
 
-        /* NAVBAR */
-        .navbar {
-            position: sticky;
-            top: 0;
-            background: rgba(10, 15, 30, 0.85);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
+        /* MAIN */
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: white;
-            padding: 5px;
+        /* CARD */
+        .card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
         }
 
-        .logo h1 {
-            font-size: 1.3rem;
-            background: linear-gradient(135deg, #00FFFF, #FF2D95);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        body.dark .card {
+            background: #1e1e1e;
+            border-color: #333;
         }
 
-        .logo p {
-            font-size: 0.6rem;
-            color: #8A8F99;
+        /* IMAGE HEADER */
+        .header-image {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        /* ABOUT CONTENT */
+        .about-content {
+            text-align: center;
         }
 
         .about-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #00FFFF, #FF2D95);
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #e07c3c, #c0392b);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            font-weight: bold;
+            font-size: 2.5rem;
+            margin: 0 auto 15px;
         }
 
-        /* MAIN CONTENT */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
-            min-height: calc(100vh - 70px);
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
         }
 
-        .greeting {
-            margin-bottom: 30px;
+        .social-btn {
+            background: #f0f0f0;
+            padding: 8px 16px;
+            border-radius: 40px;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.8rem;
         }
 
-        .greeting h2 {
-            font-size: 1.6rem;
+        body.dark .social-btn {
+            background: #2a2a2a;
+            color: #ddd;
         }
 
+        /* PLATFORM GRID */
         .platform-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 15px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .platform-card {
-            background: rgba(20, 25, 45, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 24px;
-            padding: 18px 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .platform-card.active {
-            border-color: #00FFFF;
-            background: rgba(0, 255, 255, 0.1);
-            box-shadow: 0 0 15px rgba(0,255,255,0.2);
-        }
-
-        .platform-icon {
-            font-size: 2rem;
-            margin-bottom: 6px;
-        }
-
-        .platform-name {
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .downloader-box {
-            background: rgba(15, 20, 35, 0.6);
-            backdrop-filter: blur(12px);
-            border-radius: 40px;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 25px;
-        }
-
-        .platform-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .platform-title span {
-            font-size: 1.8rem;
-        }
-
-        .platform-title h3 {
-            font-size: 1.3rem;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .input-group input {
-            flex: 1;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 60px;
-            padding: 14px 18px;
-            color: white;
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .input-group input:focus {
-            border-color: #00FFFF;
-        }
-
-        .input-group button {
-            background: linear-gradient(95deg, #00c9ff, #a855f7);
-            border: none;
-            border-radius: 60px;
-            padding: 0 25px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-        }
-
-        .loader {
-            display: none;
-            text-align: center;
-            padding: 25px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(0,255,255,0.2);
-            border-top: 3px solid cyan;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .result-area {
-            margin-top: 25px;
-            display: none;
-        }
-
-        video, audio {
-            max-width: 100%;
+            background: #f5f5f5;
             border-radius: 20px;
-            margin-top: 10px;
-        }
-
-        .download-link {
-            display: inline-block;
-            background: #00FFAA;
-            color: #000;
-            padding: 10px 22px;
-            border-radius: 60px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 12px;
-        }
-
-        .error-msg {
-            background: rgba(255,0,0,0.15);
-            border: 1px solid #ff4444;
-            border-radius: 28px;
-            padding: 15px;
-            text-align: center;
-            color: #ff8888;
-            font-size: 0.85rem;
-        }
-
-        /* STALKER MODE */
-        .stalker-mode {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .stalker-input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* TOOLS MODE */
-        .tools-mode {
-            display: none;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .tool-card {
-            background: rgba(20,25,45,0.7);
-            border-radius: 24px;
-            padding: 20px;
+            padding: 12px;
             text-align: center;
             cursor: pointer;
             transition: 0.2s;
         }
 
-        .tool-card:hover {
-            border-color: cyan;
-            background: rgba(0,255,255,0.1);
+        body.dark .platform-card {
+            background: #2a2a2a;
+        }
+
+        .platform-card.active {
+            background: #e07c3c;
+            color: white;
+        }
+
+        .platform-icon {
+            font-size: 1.6rem;
+        }
+
+        .platform-name {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* INPUT GROUP */
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 14px 18px;
+            border-radius: 50px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        body.dark .input-group input {
+            background: #2a2a2a;
+            border-color: #444;
+        }
+
+        .input-group button {
+            padding: 0 24px;
+            border-radius: 50px;
+            border: none;
+            background: #e07c3c;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            min-width: 110px;
+        }
+
+        /* RESULT */
+        .result-area {
+            margin-top: 20px;
+            display: none;
+        }
+
+        video, audio {
+            width: 100%;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 20px;
+        }
+
+        .download-link {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            background: #27ae60;
+            color: white;
+            padding: 12px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .error-msg {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        body.dark .error-msg {
+            background: #3a1a1a;
+            color: #ff8888;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #ddd;
+            border-top-color: #e07c3c;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .coming-soon {
+            text-align: center;
+            padding: 40px;
+            color: #999;
         }
 
         footer {
             text-align: center;
             padding: 15px;
-            font-size: 0.65rem;
-            color: #5A5F6E;
+            font-size: 0.7rem;
+            color: #999;
         }
 
-        @media (max-width: 550px) {
-            .platform-grid { grid-template-columns: repeat(3, 1fr); }
-            .downloader-box { padding: 20px; }
-            .input-group button { padding: 0 18px; }
+        @media (max-width: 500px) {
+            .container { padding: 15px; }
+            .card { padding: 20px; }
+            .input-group button { padding: 0 15px; min-width: 90px; }
         }
     </style>
 </head>
 <body>
 
-<!-- SIDEBAR MENU -->
+<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="logo-icon">🧠</div>
-        <h3>Xaze Tools</h3>
-        <p>v3.0 • Premium</p>
+        <h3>⚡ Xaze Tools</h3>
+        <p style="font-size: 0.7rem; color: #999;">Simple Downloader</p>
     </div>
-    <div class="menu-item active" data-page="beranda">
-        <div class="menu-icon">🏠</div>
-        <div>
-            <div class="menu-text">Beranda</div>
-            <div class="menu-sub">Downloader & Tools</div>
-        </div>
+    <div class="menu-item active" data-page="dashboard">
+        <span>🏠</span> Dashboard
     </div>
     <div class="menu-item" data-page="downloader">
-        <div class="menu-icon">⬇️</div>
-        <div>
-            <div class="menu-text">Downloader</div>
-            <div class="menu-sub">TikTok, IG, YT, FB, Pinterest</div>
-        </div>
-    </div>
-    <div class="menu-item" data-page="stalker">
-        <div class="menu-icon">👀</div>
-        <div>
-            <div class="menu-text">Stalker</div>
-            <div class="menu-sub">Coming Soon</div>
-        </div>
+        <span>⬇️</span> Downloader
     </div>
     <div class="menu-item" data-page="tools">
-        <div class="menu-icon">🛠️</div>
-        <div>
-            <div class="menu-text">Tools</div>
-            <div class="menu-sub">Utilities & Converter</div>
-        </div>
+        <span>🛠️</span> Tools
     </div>
-    <div class="menu-item" data-page="about">
-        <div class="menu-icon">ℹ️</div>
-        <div>
-            <div class="menu-text">About</div>
-            <div class="menu-sub">Developer & Info</div>
-        </div>
-    </div>
-    <div class="sidebar-footer">
-        ⚡ Developed by <strong style="color:cyan;">FIKRI.Z</strong>
+    <div class="menu-item" data-page="stalker">
+        <span>👀</span> Stalker
     </div>
 </div>
 <div class="overlay" id="overlay"></div>
@@ -440,118 +397,104 @@
 <div class="navbar">
     <button class="menu-toggle" id="menuToggle">☰</button>
     <div class="logo">
-        <h1>XAZE TOOLS X</h1>
-        <p>Downloader • Stalker • Tools</p>
+        <h2>Xaze <span>Tools</span></h2>
     </div>
-    <div class="about-icon" id="aboutIcon">XZ</div>
+    <div style="width: 30px;"></div>
 </div>
 
-<!-- MAIN CONTAINER (Default Downloader) -->
+<!-- MAIN -->
 <div class="container" id="mainContainer">
-    <div class="greeting">
-        <h2 id="pageTitle">⬇️ Xaze Downloader</h2>
-        <p id="pageSub">Pilih platform, masukkan link, download gratis!</p>
-    </div>
-
-    <!-- Platform Grid (muncul di Beranda & Downloader) -->
-    <div class="platform-grid" id="platformGrid">
-        <div class="platform-card" data-platform="tiktok">
-            <div class="platform-icon">🎵</div>
-            <div class="platform-name">TikTok</div>
-        </div>
-        <div class="platform-card" data-platform="instagram">
-            <div class="platform-icon">📸</div>
-            <div class="platform-name">Instagram</div>
-        </div>
-        <div class="platform-card" data-platform="facebook">
-            <div class="platform-icon">📘</div>
-            <div class="platform-name">Facebook</div>
-        </div>
-        <div class="platform-card" data-platform="ytmp3">
-            <div class="platform-icon">🎵</div>
-            <div class="platform-name">YouTube MP3</div>
-        </div>
-        <div class="platform-card" data-platform="ytmp4">
-            <div class="platform-icon">🎬</div>
-            <div class="platform-name">YouTube MP4</div>
-        </div>
-        <div class="platform-card" data-platform="pinterest">
-            <div class="platform-icon">📌</div>
-            <div class="platform-name">Pinterest</div>
-        </div>
-    </div>
-
-    <!-- Downloader Box -->
-    <div class="downloader-box" id="downloaderBox">
-        <div class="platform-title" id="platformTitle">
-            <span>🎵</span>
-            <h3>TikTok Downloader</h3>
-        </div>
-        <div class="input-group">
-            <input type="text" id="urlInput" placeholder="Masukkan link TikTok...">
-            <button id="downloadBtn">⬇️ Download</button>
-        </div>
-        <div class="loader" id="loader">
-            <div class="spinner"></div>
-            <span>Xaze sedang memproses...</span>
-        </div>
-        <div class="result-area" id="resultArea"></div>
-    </div>
-
-    <!-- Stalker Mode (Hidden) -->
-    <div class="stalker-mode" id="stalkerMode">
-        <div class="downloader-box">
-            <div class="platform-title">
-                <span>👀</span>
-                <h3>Stalker Mode</h3>
-            </div>
-            <p style="text-align:center; margin-bottom:20px; color:#aaa;">Fitur stalker akan segera hadir!<br>IG Story Saver, TikTok Profile, dll.</p>
-            <div class="stalker-input-group">
-                <input type="text" placeholder="Username atau link profil..." id="stalkerInput" disabled>
-                <button disabled style="opacity:0.5;">🚀 Coming Soon</button>
+    <!-- DASHBOARD (ABOUT) -->
+    <div id="dashboardPage">
+        <div class="card">
+            <img src="" alt="header" id="headerImage" class="header-image" style="display: none;">
+            <div class="about-content">
+                <div class="about-icon">🧠</div>
+                <h3>Xaze Tools X Downloader</h3>
+                <p style="margin: 10px 0; color: #666;">All-in-One Downloader</p>
+                <p style="font-size: 0.85rem;">✅ TikTok • Instagram • Facebook<br>✅ YouTube MP3/MP4 • Pinterest</p>
+                <div class="social-links">
+                    <a href="#" class="social-btn">📱 WhatsApp</a>
+                    <a href="#" class="social-btn">✈️ Telegram</a>
+                </div>
+                <hr style="margin: 15px 0;">
+                <p style="font-size: 0.75rem;">Developer: <strong>FIKRI.Z</strong><br>© Xaze Project</p>
             </div>
         </div>
     </div>
 
-    <!-- Tools Mode (Hidden) -->
-    <div class="tools-mode" id="toolsMode">
-        <div class="downloader-box">
-            <div class="platform-title">
-                <span>🛠️</span>
-                <h3>Tools Box</h3>
+    <!-- DOWNLOADER PAGE (HIDDEN) -->
+    <div id="downloaderPage" style="display: none;">
+        <div class="card">
+            <div class="platform-grid" id="platformGrid">
+                <div class="platform-card" data-platform="tiktok">
+                    <div class="platform-icon">🎵</div>
+                    <div class="platform-name">TikTok</div>
+                </div>
+                <div class="platform-card" data-platform="instagram">
+                    <div class="platform-icon">📸</div>
+                    <div class="platform-name">Instagram</div>
+                </div>
+                <div class="platform-card" data-platform="facebook">
+                    <div class="platform-icon">📘</div>
+                    <div class="platform-name">Facebook</div>
+                </div>
+                <div class="platform-card" data-platform="ytmp3">
+                    <div class="platform-icon">🎵</div>
+                    <div class="platform-name">YouTube MP3</div>
+                </div>
+                <div class="platform-card" data-platform="ytmp4">
+                    <div class="platform-icon">🎬</div>
+                    <div class="platform-name">YouTube MP4</div>
+                </div>
+                <div class="platform-card" data-platform="pinterest">
+                    <div class="platform-icon">📌</div>
+                    <div class="platform-name">Pinterest</div>
+                </div>
             </div>
-            <div class="tools-grid">
-                <div class="tool-card">🔗 Shortlink</div>
-                <div class="tool-card">📷 Image Compress</div>
-                <div class="tool-card">🎵 Audio Cutter</div>
-                <div class="tool-card">📄 Text to Speech</div>
-                <div class="tool-card">💾 QR Generator</div>
-                <div class="tool-card">🌐 IP Checker</div>
+
+            <div class="platform-title" style="text-align: center; margin-bottom: 10px;">
+                <span id="platformIcon">🎵</span> <strong id="platformName">TikTok</strong>
             </div>
-            <p style="text-align:center; margin-top:20px; color:#aaa;">⚡ Tools lainnya segera menyusul</p>
+
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="Masukkan link TikTok...">
+                <button id="actionBtn">GET MEDIA</button>
+            </div>
+
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <span>Processing...</span>
+            </div>
+            <div class="result-area" id="resultArea"></div>
         </div>
     </div>
 
-    <!-- About Mode (Hidden) -->
-    <div class="stalker-mode" id="aboutMode">
-        <div class="downloader-box" style="text-align:center;">
-            <div style="width:80px; height:80px; background:linear-gradient(135deg,#00FFFF,#FF2D95); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin:0 auto 20px;">🧠</div>
-            <h3>Xaze Tools X Downloader</h3>
-            <p style="color:#aaa; margin:10px 0;">All-in-One Platform</p>
-            <p style="margin:15px 0; font-size:0.85rem;">✅ Downloader: TikTok, IG, FB, YTMP3, YTMP4, Pinterest<br>✅ Tools: Shortlink, Compress, Audio Cutter, dll<br>✅ Stalker Mode: (Coming Soon)</p>
-            <hr style="margin:15px 0; border-color:#2a2a3a;">
-            <p style="font-size:0.8rem;">Developer: <strong style="color:cyan;">FIKRI.Z</strong><br>API by Faa • Xaze Project</p>
-            <p style="margin-top:12px; font-size:0.7rem;">📱 Telegram: @xaze_zone | WA: +62xxx</p>
+    <!-- TOOLS PAGE (COMING SOON) -->
+    <div id="toolsPage" style="display: none;">
+        <div class="card coming-soon">
+            <span style="font-size: 3rem;">🛠️</span>
+            <h3>Coming Soon</h3>
+            <p>Tools akan segera hadir!</p>
+        </div>
+    </div>
+
+    <!-- STALKER PAGE (COMING SOON) -->
+    <div id="stalkerPage" style="display: none;">
+        <div class="card coming-soon">
+            <span style="font-size: 3rem;">👀</span>
+            <h3>Coming Soon</h3>
+            <p>Stalker mode akan segera hadir!</p>
         </div>
     </div>
 </div>
 
 <footer>
-    🧠 <strong style="color:cyan;">Xaze Tools X Downloader</strong> | All features ready to use
+    ⚡ Xaze Tools | Developer FIKRI.Z
 </footer>
 
 <script>
-    // APIS
+    // API
     const APIS = {
         tiktok: "https://api-faa.my.id/faa/tiktok",
         instagram: "https://api-faa.my.id/faa/igdl",
@@ -562,82 +505,95 @@
     };
 
     let currentPlatform = "tiktok";
+    let currentMediaUrl = null;
 
-    // DOM Elements
+    // DOM
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
     const menuToggle = document.getElementById('menuToggle');
-    const menuItems = document.querySelectorAll('.menu-item');
+    const dashboardPage = document.getElementById('dashboardPage');
+    const downloaderPage = document.getElementById('downloaderPage');
+    const toolsPage = document.getElementById('toolsPage');
+    const stalkerPage = document.getElementById('stalkerPage');
     const platformCards = document.querySelectorAll('.platform-card');
-    const platformGrid = document.getElementById('platformGrid');
-    const platformTitleSpan = document.querySelector('#platformTitle span');
-    const platformTitleH3 = document.querySelector('#platformTitle h3');
     const urlInput = document.getElementById('urlInput');
-    const downloadBtn = document.getElementById('downloadBtn');
+    const actionBtn = document.getElementById('actionBtn');
     const loader = document.getElementById('loader');
     const resultArea = document.getElementById('resultArea');
-    const downloaderBox = document.getElementById('downloaderBox');
-    const stalkerMode = document.getElementById('stalkerMode');
-    const toolsMode = document.getElementById('toolsMode');
-    const aboutMode = document.getElementById('aboutMode');
-    const pageTitle = document.getElementById('pageTitle');
-    const pageSub = document.getElementById('pageSub');
+    const platformIconSpan = document.getElementById('platformIcon');
+    const platformNameSpan = document.getElementById('platformName');
 
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('show');
-    }
+    // Image header (lo ganti URL nya nanti)
+    const headerImage = document.getElementById('headerImage');
+    // GANTI URL FOTO LO DI SINI
+    headerImage.src = "https://c.termai.cc/i165/tKyRU.jpg";
+    headerImage.style.display = "block";
 
-    function openSidebar() {
-        sidebar.classList.add('open');
-        overlay.classList.add('show');
-    }
-
-    menuToggle.onclick = () => openSidebar();
+    // Sidebar
+    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+    function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('show'); }
+    menuToggle.onclick = openSidebar;
     overlay.onclick = closeSidebar;
 
-    function setActiveMenu(pageId) {
-        menuItems.forEach(item => {
-            if(item.dataset.page === pageId) item.classList.add('active');
-            else item.classList.remove('active');
-        });
+    // Navigasi
+    function showPage(page) {
+        dashboardPage.style.display = 'none';
+        downloaderPage.style.display = 'none';
+        toolsPage.style.display = 'none';
+        stalkerPage.style.display = 'none';
+        if (page === 'dashboard') dashboardPage.style.display = 'block';
+        else if (page === 'downloader') downloaderPage.style.display = 'block';
+        else if (page === 'tools') toolsPage.style.display = 'block';
+        else if (page === 'stalker') stalkerPage.style.display = 'block';
+        closeSidebar();
     }
 
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', () => showPage(item.dataset.page));
+    });
+
+    // Set Platform
     function setPlatform(platform) {
         currentPlatform = platform;
         platformCards.forEach(card => {
             card.classList.toggle('active', card.dataset.platform === platform);
         });
-        const titles = {
-            tiktok: { icon: "🎵", name: "TikTok Downloader", placeholder: "Masukkan link TikTok..." },
-            instagram: { icon: "📸", name: "Instagram Downloader", placeholder: "Masukkan link Instagram..." },
-            facebook: { icon: "📘", name: "Facebook Downloader", placeholder: "Masukkan link Facebook..." },
-            ytmp3: { icon: "🎵", name: "YouTube to MP3", placeholder: "Masukkan link YouTube..." },
-            ytmp4: { icon: "🎬", name: "YouTube to MP4", placeholder: "Masukkan link YouTube..." },
-            pinterest: { icon: "📌", name: "Pinterest Downloader", placeholder: "Masukkan link Pinterest..." }
+        const names = {
+            tiktok: { icon: "🎵", name: "TikTok", placeholder: "Masukkan link TikTok..." },
+            instagram: { icon: "📸", name: "Instagram", placeholder: "Masukkan link Instagram..." },
+            facebook: { icon: "📘", name: "Facebook", placeholder: "Masukkan link Facebook..." },
+            ytmp3: { icon: "🎵", name: "YouTube MP3", placeholder: "Masukkan link YouTube..." },
+            ytmp4: { icon: "🎬", name: "YouTube MP4", placeholder: "Masukkan link YouTube..." },
+            pinterest: { icon: "📌", name: "Pinterest", placeholder: "Masukkan link Pinterest..." }
         };
-        platformTitleSpan.innerText = titles[platform].icon;
-        platformTitleH3.innerText = titles[platform].name;
-        urlInput.placeholder = titles[platform].placeholder;
+        platformIconSpan.innerText = names[platform].icon;
+        platformNameSpan.innerText = names[platform].name;
+        urlInput.placeholder = names[platform].placeholder;
+        // AUTO CLEAR URL
+        urlInput.value = '';
+        // Reset result & button
         resultArea.style.display = 'none';
         resultArea.innerHTML = '';
+        actionBtn.innerText = 'GET MEDIA';
+        currentMediaUrl = null;
     }
 
-    function showLoader(show) {
-        loader.style.display = show ? 'block' : 'none';
-    }
+    platformCards.forEach(card => {
+        card.addEventListener('click', () => setPlatform(card.dataset.platform));
+    });
 
-    function showError(msg) {
-        resultArea.style.display = 'block';
-        resultArea.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`;
-    }
-
-    async function processDownload() {
+    // Proses Download
+    async function processMedia() {
         const url = urlInput.value.trim();
-        if (!url) { showError("Masukkan link dulu bree!"); return; }
-        showLoader(true);
+        if (!url) {
+            resultArea.style.display = 'block';
+            resultArea.innerHTML = '<div class="error-msg">⚠️ Masukkan link dulu!</div>';
+            return;
+        }
+
+        loader.style.display = 'block';
         resultArea.style.display = 'none';
-        resultArea.innerHTML = '';
+        actionBtn.disabled = true;
 
         try {
             const apiUrl = APIS[currentPlatform];
@@ -649,139 +605,80 @@
             if (!isSuccess) throw new Error("Gagal fetch data.");
 
             const result = data.hasil || data.result;
+            let mediaUrl = null;
+            let title = "";
 
             switch(currentPlatform) {
                 case 'tiktok':
-                    let videoUrl = result?.alternatives?.nowm_hd || result?.alternatives?.nowm || result?.data || result?.video;
-                    if(videoUrl) {
-                        resultArea.innerHTML = `<video controls src="${videoUrl}" style="width:100%; border-radius:20px;"></video>
-                                                <a href="${videoUrl}" download class="download-link">⬇️ Download Video</a>`;
-                        resultArea.style.display = 'block';
-                    } else throw new Error("Link tidak ditemukan.");
+                    mediaUrl = result?.alternatives?.nowm_hd || result?.alternatives?.nowm || result?.data;
                     break;
                 case 'instagram':
                     const media = result?.media || result;
-                    if(Array.isArray(media)) {
-                        let html = '';
-                        media.forEach(item => {
-                            html += `<video controls src="${item}" style="width:100%; border-radius:20px; margin-top:10px;"></video>
-                                    <a href="${item}" download class="download-link">⬇️ Download</a>`;
-                        });
-                        resultArea.innerHTML = html;
-                        resultArea.style.display = 'block';
-                    } else if(typeof media === 'string') {
-                        resultArea.innerHTML = `<img src="${media}" style="max-width:100%; border-radius:20px;"><a href="${media}" download class="download-link">⬇️ Download</a>`;
-                        resultArea.style.display = 'block';
-                    } else throw new Error("Gagal ambil media.");
+                    if(Array.isArray(media)) mediaUrl = media[0];
+                    else if(typeof media === 'string') mediaUrl = media;
                     break;
                 case 'facebook':
-                    const fbUrl = result?.hd || result?.sd || result?.video;
-                    if(fbUrl) {
-                        resultArea.innerHTML = `<video controls src="${fbUrl}" style="width:100%; border-radius:20px;"></video>
-                                                <a href="${fbUrl}" download class="download-link">⬇️ Download Video</a>`;
-                        resultArea.style.display = 'block';
-                    } else throw new Error("Link tidak ditemukan.");
+                    mediaUrl = result?.hd || result?.sd || result?.video;
                     break;
                 case 'ytmp3':
-                    const mp3Url = result?.mp3 || result?.audio;
-                    const title = result?.judul || "Audio";
-                    const thumb = result?.Gambar_mini || "";
-                    if(mp3Url) {
-                        resultArea.innerHTML = `${thumb ? `<img src="${thumb}" style="max-width:200px; border-radius:16px;">` : ''}
-                                                <h4>${title}</h4>
-                                                <audio controls src="${mp3Url}" style="width:100%;"></audio>
-                                                <a href="${mp3Url}" download class="download-link">⬇️ Download MP3</a>`;
-                        resultArea.style.display = 'block';
-                    } else throw new Error("Gagal ambil audio.");
+                    mediaUrl = result?.mp3 || result?.audio;
+                    title = result?.judul || "Audio";
                     break;
                 case 'ytmp4':
-                    const mp4Url = result?.download_url || result?.url_unduhan || result?.video;
-                    if(mp4Url) {
-                        resultArea.innerHTML = `<video controls src="${mp4Url}" style="width:100%; border-radius:20px;"></video>
-                                                <a href="${mp4Url}" download class="download-link">⬇️ Download MP4</a>`;
-                        resultArea.style.display = 'block';
-                    } else throw new Error("Gagal ambil video.");
+                    mediaUrl = result?.download_url || result?.url_unduhan;
                     break;
                 case 'pinterest':
                     const pinMedia = result?.medias || result?.media;
-                    if(Array.isArray(pinMedia) && pinMedia.length) {
-                        let html = '';
-                        pinMedia.forEach(item => {
-                            const urlMedia = item.url || item;
-                            if(urlMedia.includes('.mp4')) html += `<video controls src="${urlMedia}" style="width:100%; border-radius:20px; margin-top:10px;"></video><a href="${urlMedia}" download class="download-link">⬇️ Download</a>`;
-                            else html += `<img src="${urlMedia}" style="max-width:100%; border-radius:20px;"><a href="${urlMedia}" download class="download-link">⬇️ Download</a>`;
-                        });
-                        resultArea.innerHTML = html;
-                        resultArea.style.display = 'block';
-                    } else throw new Error("Gagal ambil media.");
+                    if(Array.isArray(pinMedia) && pinMedia.length) mediaUrl = pinMedia[0].url || pinMedia[0];
                     break;
-                default: throw new Error("Platform error.");
             }
-        } catch(err) {
-            showError(err.message);
+
+            if (!mediaUrl) throw new Error("Tidak ditemukan media.");
+
+            currentMediaUrl = mediaUrl;
+            actionBtn.innerText = 'DOWNLOAD';
+
+            // Tampilkan preview
+            let previewHtml = '';
+            if (mediaUrl.includes('.mp4') || currentPlatform === 'tiktok' || currentPlatform === 'facebook' || currentPlatform === 'ytmp4') {
+                previewHtml = `<video controls src="${mediaUrl}" style="width:100%; border-radius:20px;"></video>`;
+            } else if (currentPlatform === 'ytmp3') {
+                previewHtml = `<h4>${title}</h4><audio controls src="${mediaUrl}" style="width:100%;"></audio>`;
+            } else {
+                previewHtml = `<img src="${mediaUrl}" style="max-width:100%; border-radius:20px;">`;
+            }
+            resultArea.innerHTML = previewHtml;
+            resultArea.style.display = 'block';
+
+        } catch (err) {
+            resultArea.style.display = 'block';
+            resultArea.innerHTML = `<div class="error-msg">⚠️ ${err.message}</div>`;
         } finally {
-            showLoader(false);
+            loader.style.display = 'none';
+            actionBtn.disabled = false;
         }
     }
 
-    // Navigation
-    function showPage(page) {
-        setActiveMenu(page);
-        if(page === 'downloader' || page === 'beranda') {
-            platformGrid.style.display = 'grid';
-            downloaderBox.style.display = 'block';
-            stalkerMode.style.display = 'none';
-            toolsMode.style.display = 'none';
-            aboutMode.style.display = 'none';
-            pageTitle.innerText = page === 'beranda' ? '🏠 Beranda Xaze' : '⬇️ Xaze Downloader';
-            pageSub.innerText = 'Pilih platform, masukkan link, download gratis!';
-        } else if(page === 'stalker') {
-            platformGrid.style.display = 'none';
-            downloaderBox.style.display = 'none';
-            stalkerMode.style.display = 'block';
-            toolsMode.style.display = 'none';
-            aboutMode.style.display = 'none';
-            pageTitle.innerText = '👀 Stalker Mode';
-            pageSub.innerText = 'Fitur stalker akan segera hadir!';
-        } else if(page === 'tools') {
-            platformGrid.style.display = 'none';
-            downloaderBox.style.display = 'none';
-            stalkerMode.style.display = 'none';
-            toolsMode.style.display = 'block';
-            aboutMode.style.display = 'none';
-            pageTitle.innerText = '🛠️ Tools Box';
-            pageSub.innerText = 'Kumpulan tools seru buat lo!';
-        } else if(page === 'about') {
-            platformGrid.style.display = 'none';
-            downloaderBox.style.display = 'none';
-            stalkerMode.style.display = 'none';
-            toolsMode.style.display = 'none';
-            aboutMode.style.display = 'block';
-            pageTitle.innerText = 'ℹ️ About Xaze Tools';
-            pageSub.innerText = 'All-in-One Downloader & Tools';
+    // Download action
+    async function handleDownload() {
+        if (actionBtn.innerText === 'GET MEDIA') {
+            await processMedia();
+        } else if (actionBtn.innerText === 'DOWNLOAD' && currentMediaUrl) {
+            // Trigger download
+            const link = document.createElement('a');
+            link.href = currentMediaUrl;
+            link.download = '';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
-        closeSidebar();
     }
 
-    menuItems.forEach(item => {
-        item.addEventListener('click', () => showPage(item.dataset.page));
-    });
-
-    platformCards.forEach(card => {
-        card.addEventListener('click', () => {
-            setPlatform(card.dataset.platform);
-            showPage('downloader');
-        });
-    });
-
-    downloadBtn.addEventListener('click', processDownload);
-    urlInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') processDownload(); });
-
-    const aboutIcon = document.getElementById('aboutIcon');
-    aboutIcon.onclick = () => showPage('about');
+    actionBtn.addEventListener('click', handleDownload);
+    urlInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleDownload(); });
 
     setPlatform('tiktok');
-    showPage('beranda');
+    showPage('dashboard');
 </script>
 </body>
 </html>
