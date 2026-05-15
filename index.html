@@ -13,15 +13,11 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-        }
-
-        body {
             background-image: url('https://c.termai.cc/i184/O6R2.jpg');
             background-size: cover;
             background-position: center;
@@ -36,7 +32,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0);
+            background: rgba(0, 0, 0, 0.65);
             z-index: -1;
         }
 
@@ -84,7 +80,13 @@
         .input-group {
             display: flex;
             gap: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            transition: all 0.3s ease;
+        }
+
+        .input-group.hide {
+            display: none;
         }
 
         .input-group input {
@@ -96,6 +98,7 @@
             color: white;
             font-size: 0.9rem;
             outline: none;
+            min-width: 0;
         }
 
         .input-group input::placeholder {
@@ -107,20 +110,20 @@
         }
 
         .input-group button {
-            padding: 0 24px;
+            padding: 14px 28px;
             border-radius: 50px;
             border: none;
             background: #e07c3c;
             color: white;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 0.85rem;
-            min-width: 120px;
+            font-size: 0.9rem;
             transition: 0.2s;
+            white-space: nowrap;
         }
 
         .input-group button:active {
-            transform: scale(0.96);
+            transform: scale(0.97);
         }
 
         .loader {
@@ -180,6 +183,7 @@
             font-size: 0.9rem;
             margin-bottom: 8px;
             color: #ffffff;
+            line-height: 1.4;
         }
 
         .caption-stats {
@@ -219,10 +223,6 @@
             color: #ffffff;
         }
 
-        .author-info div div {
-            color: #aaaaaa;
-        }
-
         .download-btn {
             display: block;
             width: 100%;
@@ -240,6 +240,26 @@
         }
 
         .download-btn:active {
+            transform: scale(0.98);
+        }
+
+        .new-download-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: #e07c3c;
+            color: white;
+            padding: 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.2s;
+        }
+
+        .new-download-btn:active {
             transform: scale(0.98);
         }
 
@@ -266,6 +286,18 @@
             color: rgba(255,255,255,0.6);
             font-size: 0.7rem;
         }
+
+        @media (max-width: 500px) {
+            .input-group {
+                flex-direction: column;
+            }
+            .input-group button {
+                width: 100%;
+            }
+            .card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -281,7 +313,7 @@
 
         <div class="input-group" id="inputGroup">
             <input type="text" id="urlInput" placeholder="Masukkan link TikTok...">
-            <button id="actionBtn">GET MEDIA</button>
+            <button id="actionBtn">⚡ GET MEDIA</button>
         </div>
 
         <div class="loader" id="loader">
@@ -290,7 +322,7 @@
         </div>
 
         <div class="result-area" id="resultArea"></div>
-        <div class="info">Version 1.7.3</div>
+        <div class="info" id="infoText">Version 1.8.1</div>
     </div>
     <footer>
         🧠 Developed by <strong>FIKRI.Z</strong> | ©2026 • Sungai Mandan
@@ -298,13 +330,14 @@
 </div>
 
 <script>
-    // API NEXRAY BARU - GACOR!
+    // API NEXRAY - GACOR!
     const API_URL = "https://api.nexray.eu.cc/downloader/tiktok";
     const urlInput = document.getElementById('urlInput');
     const actionBtn = document.getElementById('actionBtn');
     const inputGroup = document.getElementById('inputGroup');
     const loader = document.getElementById('loader');
     const resultArea = document.getElementById('resultArea');
+    const infoText = document.getElementById('infoText');
 
     let currentVideoUrl = null;
 
@@ -315,18 +348,31 @@
     function showError(msg) {
         resultArea.style.display = 'block';
         resultArea.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`;
+        actionBtn.disabled = false;
+        actionBtn.innerText = '⚡ GET MEDIA';
     }
 
-    // Format angka (ribuan jadi K)
     function formatNumber(num) {
         if (!num) return '0';
         if (typeof num === 'string') {
-            if (num.includes('K')) return num;
+            if (num.includes('K') || num.includes('M')) return num;
             num = parseInt(num.replace(/[^0-9]/g, '')) || 0;
         }
         if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
         if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
         return num.toString();
+    }
+
+    // Fungsi buat reset ke mode awal (bisa dipake nanti kalo perlu)
+    function resetToInputMode() {
+        inputGroup.classList.remove('hide');
+        resultArea.style.display = 'none';
+        resultArea.innerHTML = '';
+        urlInput.value = '';
+        actionBtn.disabled = false;
+        actionBtn.innerText = '⚡ GET MEDIA';
+        infoText.innerText = 'Version 1.8.1';
+        currentVideoUrl = null;
     }
 
     async function processTikTok() {
@@ -340,6 +386,7 @@
         resultArea.style.display = 'none';
         resultArea.innerHTML = '';
         actionBtn.disabled = true;
+        actionBtn.innerText = 'LOADING...';
 
         try {
             const response = await fetch(`${API_URL}?url=${encodeURIComponent(url)}`);
@@ -385,7 +432,10 @@
             const saves = formatNumber(stats.save);
             const downloads = formatNumber(stats.download);
 
-            // Tampilkan hasil dengan caption detail + HILANGIN TOMBOL GET MEDIA
+            // HILANGKAN INPUT GROUP + BUTTON GET MEDIA
+            inputGroup.classList.add('hide');
+            
+            // Tampilkan hasil
             resultArea.style.display = 'block';
             resultArea.innerHTML = `
                 <div class="video-wrapper">
@@ -420,29 +470,52 @@
                     </div>
                 </div>
                 
-                <button class="download-btn" id="downloadBtn">⬇️ COMOT VIDEONYA</button>
+                <button class="download-btn" id="downloadBtn">⬇️ DOWNLOAD VIDEO</button>
+                <button class="new-download-btn" id="resetBtn">🔄 DOWNLOAD LAGI</button>
             `;
             
-            // HILANGKAN INPUT GROUP + BUTTON GET MEDIA
-            inputGroup.style.display = 'none';
+            infoText.innerText = 'Video siap download • Tanpa watermark';
             
-            // Event buat tombol download
+            // Event download
             const downloadBtn = document.getElementById('downloadBtn');
-            downloadBtn.addEventListener('click', function() {
+            downloadBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 if (currentVideoUrl) {
-                    const link = document.createElement('a');
-                    link.href = currentVideoUrl;
-                    link.download = 'xaze_tiktok.mp4';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    fetch(currentVideoUrl)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const blobUrl = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = blobUrl;
+                            link.download = 'xaze_tiktok.mp4';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(blobUrl);
+                        })
+                        .catch(err => {
+                            const link = document.createElement('a');
+                            link.href = currentVideoUrl;
+                            link.download = 'xaze_tiktok.mp4';
+                            link.target = '_blank';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        });
                 }
+            });
+            
+            // Event reset (download lagi)
+            const resetBtn = document.getElementById('resetBtn');
+            resetBtn.addEventListener('click', function() {
+                resetToInputMode();
             });
             
         } catch (err) {
             console.error(err);
             showError(err.message || "Terjadi kesalahan, coba lagi nanti.");
             actionBtn.disabled = false;
+            actionBtn.innerText = '⚡ GET MEDIA';
         } finally {
             showLoader(false);
         }
@@ -462,10 +535,6 @@
     urlInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') processTikTok();
     });
-
-    // GANTI GAMBAR HEADER SESUAI URL YANG LO MAU
-    const headerImg = document.getElementById('headerImage');
-    // headerImg.src = "URL_GAMBAR_LO";
 </script>
 </body>
 </html>
