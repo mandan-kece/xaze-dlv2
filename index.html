@@ -2,60 +2,38 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexray Downloader | API Publik Gratis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>TikTok DL | fikri.z</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="app-header">
-            <h1><i class="fas fa-download"></i> Nexray Downloader</h1>
-            <p>Gratis & Aman - Menggunakan API Nexray Publik</p>
-            <small>*Jangan gunakan untuk konten ilegal, dan jangan DDOS API ya! | <a href="https://api.nexray.eu.cc/" target="_blank" style="color:white; text-decoration:underline;">Dokumentasi API</a></small>
-        </header>
 
-        <!-- Form Input -->
-        <section class="input-section">
-            <h3>Pilih Platform & Masukkan Link</h3>
-            <div class="form-group">
-                <label for="platform-select"><i class="fas fa-globe"></i> Pilih Platform:</label>
-                <select id="platform-select" required>
-                    <option value="">-- Pilih Salah Satu --</option>
-                    <option value="tiktok">TikTok (Video/Musik)</option>
-                    <option value="instagram">Instagram (Foto/Video/IGTV)</option>
-                    <option value="youtube">YouTube (Video/Audio)</option>
-                    <option value="facebook">Facebook (Video)</option>
-                    <option value="twitter">Twitter/X (Video)</option>
-                    <option value="threads">Threads (Post/Foto/Video)</option>
-                    <option value="pinterest">Pinterest (Gambar/Video)</option>
-                    <option value="soundcloud">SoundCloud (Musik)</option>
-                    <option value="spotify">Spotify (Lagu/Playlist)</option>
-                    <option value="twitch">Twitch (Clip/VOD)</option>
-                </select>
-            </div>
+<div class="glass-container">
+    <div class="snow-card">
+        <div class="logo-xz">
+            <span class="xz-symbol">XZ</span>
+        </div>
+        <div class="title-section">
+            <h1>Downloader TikTok Premium</h1>
+            <p>Version 1.7.0</p>
+        </div>
 
-            <div class="form-group">
-                <label for="api-input"><i class="fas fa-link"></i> Link Post/Video/Musik:</label>
-                <input type="text" id="api-input" placeholder="Contoh: https://www.tiktok.com/@pengguna/video/123..." required>
-            </div>
+        <div id="inputPanel">
+            <input type="text" id="tiktokUrl" class="input-field" placeholder="Tempel link TikTok disini...">
+            <button id="processBtn" class="action-btn">PROSES & UNDUH</button>
+        </div>
 
-            <button id="process-btn"><i class="fas fa-cogs"></i> Proses Download</button>
-        </section>
+        <div id="loadingIndicator" class="loader-area">
+            <div class="loader-simple"></div>
+            <span>memproses video...</span>
+        </div>
 
-        <!-- Tempat Tampil Hasil -->
-        <section class="result-section" id="result-section" style="display: none;">
-            <h3><i class="fas fa-check-circle"></i> Hasil Proses</h3>
-            <div id="result-content"></div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="app-footer">
-            <p>Dibuat dengan <i class="fas fa-heart"></i> | API oleh Nexray</p>
-        </footer>
+        <div id="resultContainer" class="result-wrapper"></div>
     </div>
+    <footer>DEVELOPED BY FIKRI.Z | © 2026 • Sungai Mandan</footer>
+</div>
 
-    <script src="script.js"></script>
+<canvas id="snow-canvas"></canvas>
+<script src="script.js"></script>
 </body>
 </html>
