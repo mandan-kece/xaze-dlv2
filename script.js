@@ -1,251 +1,126 @@
-// === SETTINGAN API NEXRAY ===
-const API_BASE_URL = "https://api.nexray.eu.cc/api"; // Base URL dari API Nexray
+const API_DOWNLOAD = "https://api-faa.my.id/faa/tiktok";
+const API_CAPTION = "httpsapi.nexray.eu.cc/downloader/tiktok";
 
-// Ambil elemen dari HTML
-const platformSelect = document.getElementById('platform-select');
-const inputField = document.getElementById('api-input');
-const processBtn = document.getElementById('process-btn');
-const resultSection = document.getElementById('result-section');
-const resultContent = document.getElementById('result-content');
+const urlInput = document.getElementById('tiktokUrl');
+const processBtn = document.getElementById('processBtn');
+const inputPanel = document.getElementById('inputPanel');
+const loadingDiv = document.getElementById('loadingIndicator');
+const resultContainer = document.getElementById(', 'resultContainer');
+let currentVideoUrl = null;
 
-// Fungsi buat tampilin ikon sesuai platform
-function getPlatformIcon(platform) {
-    const icons = {
-        tiktok: '<i class="fab fa-tiktok"></i>',
-        instagram: '<i class="fab fa-instagram"></i>',
-        youtube: '<i class="fab fa-youtube"></i>',
-        facebook: '<i class="fab fa-facebook"></i>',
-        twitter: '<i class="fab fa-twitter"></i>',
-        threads: '<i class="fab fa-threads"></i>',
-        pinterest: '<i class="fab fa-pinterest"></i>',
-        soundcloud: '<i class="fab fa-soundcloud"></i>',
-        spotify: '<i class="fab fa-spotify"></i>',
-        twitch: '<i class="fab fa-twitch"></i>'
-    };
-    return icons[platform] || '<i class="fas fa-globe"></i>';
+function formatNumberShort(num) {
+    if (!num) return '0';
+    if (typeof num === 'string') return num;
+    num = parseInt(num) || 0;
+    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
+    if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
+    return num.toString();
 }
 
-// Fungsi buat tampilin loading
-function showLoading() {
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m] || m));
+}
+
+async function fetchCaptionData(tiktokUrl) {
+    try {
+        const res = await fetch(`${API_CAPTION}?url=${encodeURIComponent(tiktokUrl)}`);
+        const data = await res.json();
+        return data?.status ? data.result : null;
+    } catch { return null; }
+}
+
+async function handleDownloadProcess() {
+    const url = urlInput.value.trim();
+    if (!url) return alert("Masukkan link TikTok dulu.");
+
+    loadingDiv.style.display = 'block';
+    resultContainer.style.display = 'none';
     processBtn.disabled = true;
-    processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sedang Memproses...';
-    resultSection.style.display = 'block';
-    resultContent.innerHTML = `
-        <p class="loading-text"><i class="fas fa-circle-notch fa-spin"></i> Mohon tunggu, sedang mengambil data dari ${platformSelect.options[platformSelect.selectedIndex].text}...</p>
-    `;
-}
-
-// Fungsi buat reset tombol
-function resetButton() {
-    processBtn.disabled = false;
-    processBtn.innerHTML = '<i class="fas fa-cogs"></i> Proses Download';
-}
-
-// Fungsi buat tampilin hasil sukses
-function showSuccess(platform, data) {
-    resultContent.innerHTML = '';
-
-    // Tampilin thumbnail jika ada
-    if (data.thumbnail) {
-        const thumbnail = document.createElement('img');
-        thumbnail.src = data.thumbnail;
-        thumbnail.alt = "Thumbnail Konten";
-        thumbnail.className = "thumbnail-img";
-        resultContent.appendChild(thumbnail);
-    }
-
-    // Tampilin judul konten jika ada
-    if (data.title) {
-        const title = document.createElement('h4');
-        title.innerHTML = `${getPlatformIcon(platform)} ${data.title}`;
-        resultContent.appendChild(title);
-        const divider = document.createElement('hr');
-        resultContent.appendChild(divider);
-    }
-
-    // Tampilin opsi download
-    if (data.download && typeof data.download === 'object') {
-        // Kalau ada banyak kualitas/format
-        Object.keys(data.download).forEach((quality) => {
-            const downloadUrl = data.download[quality];
-            if (downloadUrl) {
-                const card = document.createElement('div');
-                card.className = 'download-card';
-                
-                // Tentuin nama format/kualitas
-                let qualityText = quality;
-                if (quality === 'hd') qualityText = 'Kualitas Tinggi (HD)';
-                if (quality === 'sd') qualityText = 'Kualitas Standar (SD)';
-                if (quality === 'audio') qualityText = 'Hanya Audio';
-                if (quality === 'image') qualityText = 'Gambar';
-
-                card.innerHTML = `
-                    <h4><i class="fas fa-file"></i> Opsi: ${qualityText}</h4>
-                    <p><strong>Tipe File:</strong> ${data.type || 'Tidak diketahui'}</p>
-                    ${data.size ? `<p><strong>Ukuran:</strong> ${data.size}</p>` : ''}
-                    <a href="${downloadUrl}" class="download-link" target="_blank" download>
-                        <i class="fas fa-download"></i> Unduh ${qualityText}
-                    </a>
-                `;
-                resultContent.appendChild(card);
-            }
-        });
-    } 
-    // Kalau hanya satu link download
-    else if (data.download) {
-        const card = document.createElement('div');
-        card.className = 'download-card';
-        card.innerHTML = `
-            <h4><i class="fas fa-file"></i> Siap untuk diunduh</h4>
-            <p><strong>Tipe File:</strong> ${data.type || 'Tidak diketahui'}</p>
-            ${data.size ? `<p><strong>Ukuran:</strong> ${data.size}</p>` : ''}
-            ${data.duration ? `<p><strong>Durasi:</strong> ${data.duration}</p>` : ''}
-            <a href="${data.download}" class="download-link" target="_blank" download>
-                <i class="fas fa-download"></i> Klik untuk Unduh
-            </a>
-        `;
-        resultContent.appendChild(card);
-    } 
-    // Kalau ada hasil lain (misal dari Spotify/Threads)
-    else if (data.result) {
-        data.result.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'download-card';
-            card.innerHTML = `
-                <h4><i class="fas fa-file"></i> Item ${index + 1}: ${item.title || 'Konten'}</h4>
-                ${item.artist ? `<p><strong>Artis:</strong> ${item.artist}</p>` : ''}
-                ${item.quality ? `<p><strong>Kualitas:</strong> ${item.quality}</p>` : ''}
-                <a href="${item.url}" class="download-link" target="_blank" download>
-                    <i class="fas fa-download"></i> Unduh Sekarang
-                </a>
-            `;
-            resultContent.appendChild(card);
-        });
-    }
-}
-
-// Fungsi buat tampilin error
-function showError(message) {
-    resultContent.innerHTML = `
-        <p class="error-text"><i class="fas fa-exclamation-triangle"></i> Error: ${message}</p>
-        <p class="error-text"><small>Cek kembali link atau platform yang kamu pilih ya!</small></p>
-    `;
-}
-
-// Fungsi utama buat proses download
-async function processDownload() {
-    const selectedPlatform = platformSelect.value;
-    const inputLink = inputField.value.trim();
-
-    // Validasi input
-    if (!selectedPlatform) {
-        alert('Mohon pilih platform terlebih dahulu!');
-        return;
-    }
-    if (!inputLink) {
-        alert('Mohon masukkan link konten yang benar!');
-        return;
-    }
-
-    // Tampilin loading
-    showLoading();
 
     try {
-        // Siapkan URL endpoint sesuai platform (sesuai dokumentasi API Nexray)
-        let apiEndpoint = "";
-        switch(selectedPlatform) {
-            case "tiktok":
-                apiEndpoint = `${API_BASE_URL}/tiktok?url=${encodeURIComponent(inputLink)}`;
-                break;
-            case "instagram":
-                apiEndpoint = `${API_BASE_URL}/instagram?url=${encodeURIComponent(inputLink)}`;
-                break;
-            case "youtube":
-                apiEndpoint = `${API_BASE_URL}/youtube?url=${encodeURIComponent(inputLink)}`;
-                break;
-            case "facebook":
-                apiEndpoint = `${API_BASE_URL}/facebook?url=${encodeURIComponent(inputLink)}`;
-                break;
-            case "twitter":
-                apiEndpoint = `${API_BASE_URL}/twitter?url=${encodeURIComponent(inputLink)}`;
-                break;
-            case "threads":
-                apiEndpoint = `${API_BASE_URL}/threads?url=${encodeURIComponent(inputLink)}`;
-                break;
-            case "pinterest":
-                apiEndpoint = `${API_BASE_URL}/pinterest?url=${encodeURIComponent(inputLink)}`;
-                break;
-            case "soundcloud":
-                apiEndpoint = `${API_BASE_URL}/soundcloud?url=${encodeURIComponent(inputLink)}`;
-                break;
-            case "spotify":
-                apiEndpoint = `${API_BASE_URL}/spotify?url=${encodeURIComponent(inputLink)}`;
-                break;
-            case "twitch":
-                apiEndpoint = `${API_BASE_URL}/twitch?url=${encodeURIComponent(inputLink)}`;
-                break;
-            default:
-                throw new Error("Platform tidak dikenali!");
+        const vRes = await fetch(`${API_DOWNLOAD}?url=${encodeURIComponent(url)}`);
+        const vData = await vRes.json();
+        if (!(vData.status === "benar" || vData.status === true) || !vData.result) throw new Error("Gagal ambil data");
+
+        const resVideo = vData.hasil || vData.result;
+        currentVideoUrl = resVideo?.alternatives?.nowm_hd || resVideo?.alternatives?.nowm || resVideo.data;
+        if (!currentVideoUrl) throw new Error("Link video tidak ada");
+
+        const detail = await fetchCaptionData(url);
+        let title = "TikTok Video", views = "0", likes = "0", comments = "0";
+        let authorName = "Pengguna", authorAvatar = "", coverImg = "";
+
+        if (detail) {
+            title = detail.title || title;
+            views = formatNumberShort(detail.stats?.views);
+            likes = formatNumberShort(detail.stats?.likes);
+            comments = formatNumberShort(detail.stats?.comment);
+            authorName = detail.author?.nickname || detail.author?.fullname || authorName;
+            authorAvatar = detail.author?.avatar || "";
+            coverImg = detail.cover || "";
         }
 
-        // Kirim request ke API Nexray
-        const response = await fetch(apiEndpoint, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36'
-            }
+        resultContainer.innerHTML = `
+            <div class="video-preview">
+                <video controls src="${escapeHtml(currentVideoUrl)}" poster="${escapeHtml(coverImg)}"></video>
+            </div>
+            <div class="caption-glass">
+                <div class="caption-title">📌 ${escapeHtml(title.substring(0,120))}${title.length>120?'…':''}</div>
+                <div class="stats-grid">
+                    <span class="stat-badge">👁️ ${views}</span>
+                    <span class="stat-badge">❤️ ${likes}</span>
+                    <span class="stat-badge">💬 ${comments}</span>
+                </div>
+                <div class="author-section">
+                    <img src="${escapeHtml(authorAvatar)}" class="author-avatar-mini" onerror="this.src=''">
+                    <span class="author-name">${escapeHtml(authorName)}</span>
+                </div>
+                <div class="button-group">
+                    <button class="download-btn-result" id="dlBtn">⬇️ Simpan Video</button>
+                    <div class="reset-download" id="resetBtn">↺ Unduh Lain</div>
+                    <div class="join-group-btn" onclick="window.open('https://chat.whatsapp.com/Dq6B4ba0yhnJJEAij5rqFb','_blank')">💬 Join Group</div>
+                </div>
+            </div>
+        `;
+
+        resultContainer.style.display = 'block';
+        inputPanel.classList.add('hide-panel');
+
+        document.getElementById('dlBtn').addEventListener('click', () => {
+            const a = document.createElement('a');
+            a.href = currentVideoUrl;
+            a.download = 'XZ_TikTok.mp4';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         });
 
-        // Cek kalau responsnya tidak ok
-        if (!response.ok) {
-            throw new Error(`Server merespon dengan kode ${response.status} - Coba lagi nanti!`);
-        }
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            resultContainer.style.display = 'none';
+            inputPanel.classList.remove('hide-panel');
+            urlInput.value = ''; processBtn.disabled = false;
+        });
 
-        // Baca hasil dari API
-        const data = await response.json();
-
-        // Cek kalau API balik pesan error
-        if (data.status === false || data.error) {
-            throw new Error(data.message || data.error || 'Gagal mengambil data dari API!');
-        }
-
-        // Tampilin hasil sukses
-        showSuccess(selectedPlatform, data);
-
-    } catch (error) {
-        // Tampilin pesan error
-        showError(error.message || 'Terjadi kesalahan tidak diketahui');
+    } catch (err) {
+        resultContainer.style.display = 'block';
+        resultContainer.innerHTML = `<div style="color:#ffd0d0; background:rgba(0,0,0,0.4); padding:15px; border-radius:16px; text-align:center">⚠️ ${err.message}</div>`;
     } finally {
-        // Reset tombol meskipun sukses atau gagal
-        resetButton();
+        loadingDiv.style.display = 'none';
+        processBtn.disabled = false;
     }
 }
 
-// Tambah event listener ke tombol proses
-processBtn.addEventListener('click', processDownload);
+processBtn.addEventListener('click', handleDownloadProcess);
+urlInput.addEventListener('keypress', e => e.key === 'Enter' && handleDownloadProcess());
 
-// Tambah event buat bisa tekan Enter buat proses
-inputField.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        processDownload();
-    }
-});
+// Efek Salju Ringan
+const canvas = document.getElementById('snow-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+let snow = [];
 
-// Tambah event buat tampilin contoh link sesuai platform yang dipilih
-platformSelect.addEventListener('change', () => {
-    const selectedText = platformSelect.options[platformSelect.selectedIndex].text;
-    if (selectedText.includes('TikTok')) {
-        inputField.placeholder = "Contoh: https://www.tiktok.com/@pengguna/video/72564123...";
-    } else if (selectedText.includes('Instagram')) {
-        inputField.placeholder = "Contoh: https://www.instagram.com/p/CvXyZ.../";
-    } else if (selectedText.includes('YouTube')) {
-        inputField.placeholder = "Contoh: https://www.youtube.com/watch?v=abc123...";
-    } else if (selectedText.includes('Facebook')) {
-        inputField.placeholder = "Contoh: https://www.facebook.com/pengguna/videos/123.../";
-    } else if (selectedText.includes('Twitter')) {
-        inputField.placeholder = "Contoh: https://twitter.com/pengguna/status/123...";
-    } else {
-        inputField.placeholder = `Masukkan link ${selectedText.split('(')[0]} di sini...`;
-    }
-});
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+function initSnow(count=80) {
+    snow = [];
+    for (let i=0;i<count;i++) snow.push({
+        x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.5+0.4,
+        spd:Math.random()*0.5+
