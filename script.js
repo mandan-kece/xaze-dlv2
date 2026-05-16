@@ -1,11 +1,11 @@
 const API_DOWNLOAD = "https://api-faa.my.id/faa/tiktok";
-const API_CAPTION = "httpsapi.nexray.eu.cc/downloader/tiktok";
+const API_CAPTION = "https://api.nexray.eu.cc/downloader/tiktok";
 
 const urlInput = document.getElementById('tiktokUrl');
 const processBtn = document.getElementById('processBtn');
 const inputPanel = document.getElementById('inputPanel');
 const loadingDiv = document.getElementById('loadingIndicator');
-const resultContainer = document.getElementById(', 'resultContainer');
+const resultContainer = document.getElementById('resultContainer');
 let currentVideoUrl = null;
 
 function formatNumberShort(num) {
@@ -73,7 +73,7 @@ async function handleDownloadProcess() {
                     <span class="stat-badge">💬 ${comments}</span>
                 </div>
                 <div class="author-section">
-                    <img src="${escapeHtml(authorAvatar)}" class="author-avatar-mini" onerror="this.src=''">
+                    <img src="${escapeHtml(authorAvatar)}" class="author-avatar-mini" onerror="this.style.display='none'">
                     <span class="author-name">${escapeHtml(authorName)}</span>
                 </div>
                 <div class="button-group">
@@ -123,4 +123,10 @@ function initSnow(count=80) {
     snow = [];
     for (let i=0;i<count;i++) snow.push({
         x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.5+0.4,
-        spd:Math.random()*0.5+
+        spd:Math.random()*0.5+0.2
+    });
+}
+function drawSnow() {
+    ctx.clearRect(0,0,w,h);
+    snow.forEach(f => {
+        ctx.beginPath(); ctx.arc(f
